@@ -80,7 +80,7 @@ class RepoConfig(object):
 	"""Stores config of one repository"""
 
 	__slots__ = ('aliases', 'allow_missing_manifest', 'allow_provide_virtual',
-		'auto_sync', 'cache_formats', 'create_manifest', 'disable_manifest',
+		'auto_sync', 'cache_formats', 'create_manifest', 'disabled', 'disable_manifest',
 		'eapi', 'eclass_db', 'eclass_locations', 'eclass_overrides',
 		'find_invalid_path_char', 'force', 'format', 'local_config', 'location',
 		'main_repo', 'manifest_hashes', 'masters', 'missing_repo_name',
@@ -193,6 +193,11 @@ class RepoConfig(object):
 		else:
 			location = None
 		self.location = location
+
+		disabled = repo_opts.get('disabled')
+		if disabled is not None:
+			disabled = disabled.strip().lower() == 'true'
+		self.disabled = disabled or False
 
 		missing = True
 		self.name = name
@@ -654,7 +659,10 @@ class RepoConfigLoader(object):
 		# Do this before expanding aliases, so that location_map and
 		# treemap consistently map unaliased names whenever available.
 		for repo_name, repo in list(prepos.items()):
-			if repo.location is None:
+			if repo.disabled:
+				del prepos[repo_name]
+				continue
+			elif repo.location is None:
 				if repo_name != 'DEFAULT':
 					# Skip this warning for repoman (bug #474578).
 					if settings.local_config and paths:
