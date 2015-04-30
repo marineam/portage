@@ -1030,8 +1030,7 @@ class binarytree(object):
 				# With Python 2, the EnvironmentError message may
 				# contain bytes or unicode, so use _unicode to ensure
 				# safety with all locales (bug #532784).
-				writemsg("!!! %s\n\n" % _unicode(e,
-					_encodings["stdio"], errors="replace"))
+				writemsg("!!! %s\n\n" % _unicode(e))
 				del e
 				pkgindex = None
 			if proc is not None:
